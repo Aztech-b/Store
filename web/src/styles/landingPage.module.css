@@ -1,0 +1,13 @@
+:root {
+    --title-text-size: var(--text-7xl);
+}
+
+.title {
+    font-size: var(--title-text-size);
+    line-height: var(--tw-leading, var(--title-text-size));
+}
+
+.cursor {
+    font-size: var(--title-text-size);
+    color: currentColor;
+}

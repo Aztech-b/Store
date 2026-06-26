@@ -1,3 +1,4 @@
+import { Outlet } from "react-router";
 import NavBar from "./components/NavBar";
 import { ThemeProvider } from "./hooks/useTheme";
 
@@ -7,6 +8,7 @@ function App() {
             <div className="min-w-screen flex justify-center">
                 <div className="max-w-max-content w-full">
                     <NavBar />
+                    <Outlet></Outlet>
                 </div>
             </div>
         </ThemeProvider>
