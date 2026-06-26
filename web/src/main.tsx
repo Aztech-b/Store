@@ -3,12 +3,14 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import App from "./App.tsx";
+import ExplorePage from "./components/ExplorePage.tsx";
 import LandingPage from "./components/LandingPage.tsx";
 import { client } from "./components/SanityClient.ts";
 import "./index.css";
 import "./main.css";
 
 const POSTS_QUERY = `*[_type == "product"] {
+    _id, 
     name,
     image,
     customOptions[] {
@@ -21,10 +23,16 @@ const router = createBrowserRouter([
     {
         path: "/",
         element: <App />,
-        loader: async () => {
-            return { products: await client.fetch<SanityDocument[]>(POSTS_QUERY) };
-        },
-        children: [{ index: true, element: <LandingPage></LandingPage> }],
+        children: [
+            { index: true, element: <LandingPage></LandingPage> },
+            {
+                path: "/explore",
+                element: <ExplorePage />,
+                loader: async () => {
+                    return { products: await client.fetch<SanityDocument[]>(POSTS_QUERY) };
+                },
+            },
+        ],
     },
 ]);
 
