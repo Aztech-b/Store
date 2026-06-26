@@ -10,7 +10,7 @@ import { Icon } from "./globals";
 
 function NavBar() {
     return (
-        <header className="h-navbar flex items-center">
+        <header className="h-navbar flex items-center border-b-2">
             <div>
                 <Icon size={50}></Icon>
             </div>
