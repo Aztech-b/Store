@@ -1,0 +1,33 @@
+{
+    "name": "store",
+    "version": "1.0.0",
+    "description": "Simple store for web dev practice",
+    "keywords": [
+        "store",
+        "typescript",
+        "javascript",
+        "sanity",
+        "react"
+    ],
+    "homepage": "https://github.com/Aztech-b/Store#readme",
+    "bugs": {
+        "url": "https://github.com/Aztech-b/Store/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com/Aztech-b/Store.git"
+    },
+    "license": "ISC",
+    "author": "Azkhan Bakdaulet",
+    "type": "module",
+    "main": "index.js",
+    "workspaces": [
+        "web",
+        "studio"
+    ],
+    "scripts": {
+        "dev:web": "npm run dev --workspace=web",
+        "dev:studio": "npm run dev --workspace=studio",
+        "dev": "npm run dev:web & npm run dev:studio"
+    }
+}
