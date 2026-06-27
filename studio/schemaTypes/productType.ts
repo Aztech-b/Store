@@ -11,8 +11,33 @@ export const productType = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'description',
+      type: 'string',
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'category',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'T-Shirt', value: 't-shirt'},
+          {title: 'Accessories', value: 'accessories'},
+          {title: 'Caps & Hats', value: 'hats'},
+          {title: 'Sneakers', value: 'sneakers'},
+        ],
+        layout: 'dropdown',
+      },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
       name: 'image',
       type: 'image',
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'price',
+      type: 'number',
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'customOptions',

@@ -13,11 +13,16 @@ const POSTS_QUERY = `*[_type == "product"] {
     _id, 
     name,
     image,
+    description, 
+    category, 
+    price, 
     customOptions[] {
         title,
         values
     }
 }`;
+
+const CATEGORIES_QUERY = `array::unique(*[_type == "product" && defined(category)].category)`;
 
 const router = createBrowserRouter([
     {
@@ -29,7 +34,10 @@ const router = createBrowserRouter([
                 path: "/explore",
                 element: <ExplorePage />,
                 loader: async () => {
-                    return { products: await client.fetch<SanityDocument[]>(POSTS_QUERY) };
+                    return {
+                        products: await client.fetch<SanityDocument[]>(POSTS_QUERY),
+                        categories: await client.fetch<SanityDocument[]>(CATEGORIES_QUERY),
+                    };
                 },
             },
         ],
