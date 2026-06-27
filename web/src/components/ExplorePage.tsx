@@ -1,10 +1,13 @@
 import type { SanityDocument } from "@sanity/client";
 import type { SanityImageSource } from "@sanity/image-url";
+import { useState } from "react";
 import { Link, useLoaderData } from "react-router";
 import { urlFor } from "./SanityClient";
 import { Button } from "./ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
-import { Field, FieldLabel } from "./ui/field";
+import { Checkbox } from "./ui/checkbox";
+import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "./ui/field";
+import { Slider } from "./ui/slider";
 
 type ProductData = {
     name: string;
@@ -15,10 +18,13 @@ type ProductData = {
 };
 
 function ExplorePage() {
-    const { products } = useLoaderData() as {
+    const { products, categories, price } = useLoaderData() as {
         products: (SanityDocument & ProductData)[];
-        categories: SanityDocument[];
+        categories: string[];
+        price: { min: number; max: number };
     };
+    const [priceSliderValue, setPriceSliderValue] = useState([price.min, price.max]);
+    // const [categoryFilter, setCategoryFilter] = useState([]);
     return (
         <main className="grid grid-cols-3 pt-20 mt-20 gap-10">
             <div className="">
@@ -26,22 +32,52 @@ function ExplorePage() {
                     <CardHeader>
                         <CardTitle>Filter & Sort</CardTitle>
                         <CardAction>
-                            <Button variant={"outline"} size={"sm"}>
+                            <Button variant={"ghost"} size={"sm"}>
                                 Reset
                             </Button>
                         </CardAction>
                     </CardHeader>
                     <CardContent>
-                        <Field>
-                            <FieldLabel>Price</FieldLabel>
-                        </Field>
+                        <FieldSet>
+                            <FieldGroup className="gap-2">
+                                {categories.map((category) => (
+                                    <Field key={category} orientation={"horizontal"}>
+                                        <Checkbox id={category}></Checkbox>
+                                        <FieldLabel>{category}</FieldLabel>
+                                    </Field>
+                                ))}
+                            </FieldGroup>
+                            <FieldGroup className="mt-6">
+                                <Field>
+                                    <div className="flex justify-between items-center">
+                                        <FieldLegend className="m-0">Price</FieldLegend>
+                                        <p>{`MIN: ${priceSliderValue[0]}  MAX: ${priceSliderValue[1]}`}</p>
+                                    </div>
+
+                                    <Slider
+                                        step={1}
+                                        min={price.min}
+                                        max={price.max}
+                                        onValueChange={setPriceSliderValue}
+                                        value={priceSliderValue}
+                                    />
+                                </Field>
+                            </FieldGroup>
+                        </FieldSet>
                     </CardContent>
+                    <CardFooter>
+                        <Button type="submit" className="w-full">
+                            Filter
+                        </Button>
+                    </CardFooter>
                 </Card>
             </div>
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] mt-10 col-span-2 gap-2">
-                {products.map((product) => (
-                    <ProductCard key={product._id} data={product} />
-                ))}
+            <div className="mt-10 col-start-2 col-span-2">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-2">
+                    {products.map((product) => (
+                        <ProductCard key={product._id} data={product} />
+                    ))}
+                </div>
             </div>
         </main>
     );
