@@ -38,7 +38,7 @@ function ExplorePage() {
                     </CardContent>
                 </Card>
             </div>
-            <div className="grid grid-cols-3 mt-10 col-span-2 gap-2">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] mt-10 col-span-2 gap-2">
                 {products.map((product) => (
                     <ProductCard key={product._id} data={product} />
                 ))}
@@ -49,7 +49,7 @@ function ExplorePage() {
 
 function ProductCard({ data }: { data: SanityDocument & ProductData }) {
     return (
-        <Card className="pt-0">
+        <Card className="pt-0" size="sm">
             {data.image === null ? null : <img src={urlFor(data.image).url()} alt="" />}
             <CardHeader>
                 <CardTitle>{data.name}</CardTitle>
