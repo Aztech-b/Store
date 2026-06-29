@@ -1,23 +1,22 @@
 import type { SanityDocument } from "@sanity/client";
-import type { SanityImageSource } from "@sanity/image-url";
+import type { ProductData } from "@store/shared";
 import { useState } from "react";
-import { Link, useLoaderData } from "react-router";
+import { Link, useLoaderData, useNavigate, useSearchParams } from "react-router";
 import { urlFor } from "./SanityClient";
 import { Button } from "./ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Checkbox } from "./ui/checkbox";
 import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "./ui/field";
+import { Pagination } from "./ui/pagination";
 import { Slider } from "./ui/slider";
 
-type ProductData = {
-    name: string;
-    description: string;
-    price: number;
-    image: SanityImageSource;
-    category: string | "t-shirt" | "accessories" | "hats" | "sneakers";
-};
-
 function ExplorePage() {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [params, setParams] = useSearchParams();
+    const navigate = useNavigate();
+    if (params.get("page") === null) {
+        navigate("/explore?page-1");
+    }
     const { products, categories, price } = useLoaderData() as {
         products: (SanityDocument & ProductData)[];
         categories: string[];
@@ -78,6 +77,7 @@ function ExplorePage() {
                         <ProductCard key={product._id} data={product} />
                     ))}
                 </div>
+                <Pagination></Pagination>
             </div>
         </main>
     );

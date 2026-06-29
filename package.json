@@ -23,11 +23,15 @@
     "main": "index.js",
     "workspaces": [
         "web",
-        "studio"
+        "studio",
+        "shared"
     ],
     "scripts": {
         "dev:web": "npm run dev --workspace=web",
         "dev:studio": "npm run dev --workspace=studio",
-        "dev": "npm run dev:web & npm run dev:studio"
+        "dev": "concurrently \"npm run dev:web\" \"npm run dev:studio\""
+    },
+    "devDependencies": {
+        "concurrently": "^10.0.3"
     }
 }
