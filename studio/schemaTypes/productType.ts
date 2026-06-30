@@ -71,6 +71,17 @@ export const productType = defineType({
     }),
 
     defineField({
+      name: 'price',
+      title: 'Price ($)',
+      type: 'number',
+      hidden: ({document}) => {
+        // 🎯 Hide this field if the variants array has active items
+        const hasVariants = Array.isArray(document?.variants) && document.variants.length > 0
+        return hasVariants
+      },
+    }),
+
+    defineField({
       name: 'variantPrices',
       title: 'Generated Variant Pricing & Stock',
       type: 'array',
@@ -92,6 +103,10 @@ export const productType = defineType({
       ],
       components: {
         input: VariantMatrixInput,
+      },
+      hidden: ({document}) => {
+        const hasVariants = Array.isArray(document?.variants) && document.variants.length > 0
+        return !hasVariants
       },
     }),
   ],
