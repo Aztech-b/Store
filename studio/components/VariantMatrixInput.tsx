@@ -4,8 +4,16 @@ import type {Variant} from '@store/shared'
 import {useCallback, useEffect, useMemo} from 'react'
 import {set, unset, useFormValue} from 'sanity'
 
-function cartesianProduct(arrays: string[][]): string[][] {
-  return arrays.reduce<string[][]>((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())), [[]])
+type ComboItem = {
+  text: string
+  coordinate: string
+}
+
+function cartesianProduct(data: ComboItem[][]): ComboItem[][] {
+  return data.reduce<ComboItem[][]>(
+    (accumulator, current) => accumulator.flatMap((d) => current.map((e) => [...d, e])),
+    [[]],
+  )
 }
 
 export function VariantMatrixInput(props: any) {
@@ -18,44 +26,40 @@ export function VariantMatrixInput(props: any) {
   } = props
   const EMPTY_VARIANTS_ARRAY: Variant[] = []
   const variants = (useFormValue(['variants']) as Variant[]) || EMPTY_VARIANTS_ARRAY
-  console.log(value)
 
   const generatedCombinations = useMemo(() => {
+    console.log('new combination')
     const validGroups = variants.filter(
       (group) => group.canChangePrice && group.variantName && group.values?.length > 0,
     )
     if (validGroups.length === 0) return []
 
-    const attributeValues = validGroups.map((group) => group.values)
+    const attributeValues = validGroups.map((group, groupIndex) =>
+      group.values.map((val, valueIndex) => ({
+        text: val,
+        coordinate: `${groupIndex}:${valueIndex}`, // i used coordinated as id
+      })),
+    )
     const rawCombos = cartesianProduct(attributeValues)
 
     const result = rawCombos.map((combo) => {
-      const title = combo.join(' / ')
-      const id = combo.join('-').toLowerCase().replace(/\s+/g, '')
-      return {id, title}
+      const title = combo.map((c) => c.text).join(' / ')
+      const id = combo.map((c) => `${c.text.toLowerCase()}-${c.coordinate}`).join('_')
+      return {title, id}
     })
+
+    console.log(result)
 
     return result
   }, [variants])
 
   const handleFieldChange = useCallback(
-    (id: string, title: string, fieldName: 'price' | 'quantity' | string, fieldValue: string) => {
-      const numValue = fieldValue === '' ? null : Number(fieldValue)
+    (fieldName: 'price' | 'quantity' | string, fieldValue: string, _key: string) => {
+      const numValue = fieldValue === '' ? 0 : Number(fieldValue)
 
-      const existingIndex = value.findIndex((item) => item.id === id)
-      let nextValue = [...value] // created a MUTABLE copy of variable value
-
-      if (existingIndex > -1) {
-        nextValue[existingIndex] = {...nextValue[existingIndex], [fieldName]: numValue}
-      } else {
-        nextValue.push({id, title, [fieldName]: numValue})
-      }
-
-      nextValue = nextValue.filter((item) => generatedCombinations.some((c) => c.id === item.id))
-
-      onChange(nextValue.length ? set(nextValue) : unset())
+      onChange(set(numValue, [{_key: _key}, fieldName]))
     },
-    [onChange, value, generatedCombinations],
+    [onChange],
   )
 
   useEffect(() => {
@@ -65,6 +69,7 @@ export function VariantMatrixInput(props: any) {
       }
       return
     }
+    console.log('effect')
 
     const matchesPerfect =
       value.length === generatedCombinations.length &&
@@ -76,8 +81,8 @@ export function VariantMatrixInput(props: any) {
 
         return {
           _key: existingItem?._key || randomKey(12),
-          _type: 'object',
           id: combo.id,
+          _type: 'object',
           title: combo.title,
           price: existingItem?.price ?? 0,
           quantity: existingItem?.quantity ?? 0,
@@ -119,7 +124,7 @@ export function VariantMatrixInput(props: any) {
       </Card>
 
       {generatedCombinations.map((combination) => {
-        const currentData = value.find((item) => item.id === combination.id) || {}
+        const currentData = value.find((item) => item._key === combination.id)
         return (
           <Card key={combination.id} padding={2} border>
             <Grid gridTemplateColumns={[5, 5, 6]} gap={2}>
@@ -131,32 +136,27 @@ export function VariantMatrixInput(props: any) {
               <Box>
                 <TextInput
                   type="number"
-                  //   placeholder="0.00"
-                  //   defaultValue={0}
-                  value={currentData.price ?? ''}
-                  onChange={(e) =>
-                    handleFieldChange(
-                      combination.id,
-                      combination.title,
-                      'price',
-                      e.currentTarget.value,
-                    )
-                  }
+                  value={currentData?.price}
+                  onChange={(e) => {
+                    e.currentTarget.value =
+                      e.currentTarget.value.charAt(0) === '0'
+                        ? e.currentTarget.value.slice(1)
+                        : e.currentTarget.value
+                    handleFieldChange('price', e.currentTarget.value, combination.id)
+                  }}
                 />
               </Box>
               <Box>
                 <TextInput
                   type="number"
-                  placeholder="0"
-                  value={currentData.quantity ?? ''}
-                  onChange={(e) =>
-                    handleFieldChange(
-                      combination.id,
-                      combination.title,
-                      'quantity',
-                      e.currentTarget.value,
-                    )
-                  }
+                  value={currentData?.quantity}
+                  onChange={(e) => {
+                    e.currentTarget.value =
+                      e.currentTarget.value.charAt(0) === '0'
+                        ? e.currentTarget.value.slice(1)
+                        : e.currentTarget.value
+                    handleFieldChange('quantity', e.currentTarget.value, combination.id)
+                  }}
                 />
               </Box>
             </Grid>
